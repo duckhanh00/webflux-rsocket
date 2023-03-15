@@ -1,4 +1,4 @@
-package rsocket.share;
+package rsocket.share.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

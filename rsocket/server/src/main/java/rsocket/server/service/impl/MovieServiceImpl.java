@@ -53,23 +53,24 @@ public class MovieServiceImpl implements MovieService {
   }
 
   @Override
-  public Mono<Movie> likeMovie(String imdb) {
-    return getMovie(imdb)
+  public Mono<String> likeMovie(String imdb) {
+    return movieRepository
+        .findById(imdb)
         .flatMap(
             item -> {
               item.setLikes(item.getLikes() + 1);
-              return movieRepository.save(item);
+              return movieRepository.save(item).thenReturn("Like Movie");
             })
         .switchIfEmpty(Mono.error(new MovieNotFoundException(imdb)));
   }
 
   @Override
-  public Mono<Movie> dislikeMovie(String imdb) {
+  public Mono<String> dislikeMovie(String imdb) {
     return getMovie(imdb)
         .flatMap(
             item -> {
               item.setDislikes(item.getDislikes() + 1);
-              return movieRepository.save(item);
+              return movieRepository.save(item).thenReturn("Dislike Movie");
             })
         .switchIfEmpty(Mono.error(new MovieNotFoundException(imdb)));
   }

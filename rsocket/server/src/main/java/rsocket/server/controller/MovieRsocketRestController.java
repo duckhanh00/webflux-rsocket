@@ -4,13 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.rsocket.RSocketRequester;
-import org.springframework.messaging.rsocket.annotation.ConnectMapping;
 import org.springframework.messaging.rsocket.annotation.support.RSocketFrameTypeMessageCondition;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import rsocket.client.model.AddMovieDTO;
@@ -20,30 +19,24 @@ import rsocket.server.service.MovieService;
 
 @RequiredArgsConstructor
 @Controller
-public class MovieRSocketController {
+public class MovieRsocketRestController {
 
   private static final String RSOCKET_FRAME_TYPE =
       RSocketFrameTypeMessageCondition.FRAME_TYPE_HEADER;
   private static final String CONTENT_TYPE = "contentType";
 
-  // -- Request-Stream
-  // ===================
   private final MovieService movieService;
 
-  // -- Request-Response
-  // =====================
   private final MovieMapper movieMapper;
 
-//  @GetMapping(value = "/movies", produces = MediaType.APPLICATION_NDJSON_VALUE)
-  @MessageMapping("get.movies")
+  @GetMapping(value = "/movies", produces = MediaType.APPLICATION_NDJSON_VALUE)
   public Flux<Movie> getMovies(
       @Header(RSOCKET_FRAME_TYPE) String rsocketFrameType,
       @Header(CONTENT_TYPE) String contentType) {
     return movieService.getMovies();
   }
 
-//  @GetMapping("/movies/{imdb}")
-  @MessageMapping("get.movie")
+  @GetMapping("/movies/{imdb}")
   public Mono<Movie> getMovie(
       String imdb,
       @Header(RSOCKET_FRAME_TYPE) String rsocketFrameType,
@@ -51,8 +44,7 @@ public class MovieRSocketController {
     return movieService.getMovie(imdb);
   }
 
-//  @PostMapping("/movies")
-  @MessageMapping("add.movie")
+  @PostMapping("/movies")
   public Mono<Movie> addMovie(
       @Valid AddMovieDTO addMovieDTO,
       @Header(RSOCKET_FRAME_TYPE) String rsocketFrameType,
@@ -60,8 +52,7 @@ public class MovieRSocketController {
     return movieService.addMovie(addMovieDTO);
   }
 
-//  @DeleteMapping("/movies/{imdb}")
-  @MessageMapping("delete.movie")
+  @DeleteMapping("/movies/{imdb}")
   public Mono<Movie> deleteMovie(
       String imdb,
       @Header(RSOCKET_FRAME_TYPE) String rsocketFrameType,
@@ -69,8 +60,7 @@ public class MovieRSocketController {
     return movieService.deleteMovie(imdb);
   }
 
-//  @PutMapping("/movies/{imdb}/like")
-  @MessageMapping("like.movie")
+  @PutMapping("/movies/{imdb}/like")
   public Mono<String> likeMovie(
       String imdb,
       @Header(RSOCKET_FRAME_TYPE) String rsocketFrameType,
@@ -78,35 +68,11 @@ public class MovieRSocketController {
     return movieService.likeMovie(imdb);
   }
 
-//  @PutMapping("/movies/{imdb}/dislike")
-  @MessageMapping("dislike.movie")
+  @PutMapping("/movies/{imdb}/dislike")
   public Mono<String> dislikeMovie(
       String imdb,
       @Header(RSOCKET_FRAME_TYPE) String rsocketFrameType,
       @Header(CONTENT_TYPE) String contentType) {
     return movieService.dislikeMovie(imdb);
-  }
-
-  //  @MessageMapping("select.movies")
-  //  public Flux<String> selectMovies(
-  //      Flux<String> imdbs,
-  //      @Header(RSOCKET_FRAME_TYPE) String rsocketFrameType,
-  //      @Header(CONTENT_TYPE) String contentType) {
-  //    return imdbs
-  //        .flatMap(movieService::getMovie)
-  //        .map(
-  //            movie ->
-  //                String.format(
-  //                    "| IMBD: %-10s | TITLE: %-30s | LIKES: %-5s | DISLIKES: %-5s |",
-  //                    movie.getImdb(), movie.getTitle(), movie.getLikes(), movie.getDislikes()));
-  //  }
-
-  @ConnectMapping("client.registration")
-  public Mono<Void> clientRegistration(
-      RSocketRequester rSocketRequester,
-      @Payload String clientId,
-      @Header(RSOCKET_FRAME_TYPE) String rsocketFrameType,
-      @Header(CONTENT_TYPE) String contentType) {
-    return Mono.empty();
   }
 }
