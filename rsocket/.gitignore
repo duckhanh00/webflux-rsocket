@@ -20,6 +20,7 @@ target/
 *.ipr
 *.xml
 .idea/*
+.idea/
 /.idea/*
 .idea/libraries/*
 
