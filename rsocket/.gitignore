@@ -21,6 +21,7 @@ target/
 *.xml
 .idea/*
 /.idea/*
+.idea/libraries/*
 
 ### NetBeans ###
 /nbproject/private/
